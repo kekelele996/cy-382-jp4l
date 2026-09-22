@@ -10,7 +10,11 @@ export class JwtGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const token = req.headers.authorization?.replace('Bearer ', '');
     if (!token) throw new AppException(ERROR_CODES.AUTH_REQUIRED, '请先登录', 401);
-    req.user = this.jwt.verify(token);
+    try {
+      req.user = this.jwt.verify(token);
+    } catch {
+      throw new AppException(ERROR_CODES.AUTH_REQUIRED, '登录已过期，请重新登录', 401);
+    }
     return true;
   }
 }

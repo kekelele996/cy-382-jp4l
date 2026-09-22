@@ -6,6 +6,7 @@ import { TripModule } from './modules/trip/trip.module';
 import { CompanionModule } from './modules/companion/companion.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { DiaryModule } from './modules/diary/diary.module';
+import { BudgetModule } from './modules/budget/budget.module';
 
-@Module({ imports: [TypeOrmModule.forRoot(typeormConfig()), UserModule, TripModule, CompanionModule, ChatModule, DiaryModule] })
+@Module({ imports: [TypeOrmModule.forRoot(typeormConfig()), UserModule, TripModule, CompanionModule, ChatModule, DiaryModule, BudgetModule] })
 export class AppModule {}

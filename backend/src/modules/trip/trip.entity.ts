@@ -7,8 +7,8 @@ export class TripEntity {
   @Column() destination!: string;
   @Column({ name: 'depart_date', type: 'date' }) departDate!: string;
   @Column() days!: number;
-  @Column({ name: 'budget_min', type: 'decimal', nullable: true }) budgetMin?: number;
-  @Column({ name: 'budget_max', type: 'decimal', nullable: true }) budgetMax?: number;
+  @Column({ name: 'budget_min', type: 'decimal', precision: 12, scale: 2, nullable: true }) budgetMin?: number;
+  @Column({ name: 'budget_max', type: 'decimal', precision: 12, scale: 2, nullable: true }) budgetMax?: number;
   @Column() transport!: string;
   @Column({ name: 'companion_count' }) companionCount!: number;
   @Column({ name: 'gender_preference', nullable: true }) genderPreference?: string;

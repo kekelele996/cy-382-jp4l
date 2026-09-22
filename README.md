@@ -11,14 +11,25 @@ docker compose up -d --build
 
 访问地址：前端 http://localhost:18402 ，后端 http://localhost:19402/health 。
 
+内置演示数据：账号 `demo@tripmatch.cn` / `demo123456`（行程「大理」发起人，含四个分类的预算额度），登录后可在「协作看板」中体验费用登记与分类额度调拨。
+
 ## 项目主要功能
 
 - 发布包含目的地、时间、预算、交通方式和旅伴偏好的行程。
 - 根据目的地、时间和预算做旅伴匹配评分。
 - 行程协作看板维护每日安排、住宿和交通方案。
-- 预算管理展示计划费用和实际花费。
+- 分类预算管理：行程按交通/住宿/餐饮/门票设置分类额度，合计不得超过总预算；成员登记费用只扣减对应分类，超出该分类剩余额度整笔拒绝并返回可登记上限；发起人可在分类间调拨剩余额度（调出后不得低于已用金额）；登记与调拨基于幂等键和数据库事务保证重复或并发操作只生效一次。
 - Socket.IO 支持行程成员即时聊天。
 - 旅行日记和用户主页为后续扩展预留清晰模块。
+
+## 预算接口一览
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | /api/trips/:id/budget | 预算总览：各分类额度、已用、剩余及费用/调拨记录 |
+| PUT | /api/trips/:id/budget/categories | 设置分类额度（仅发起人，合计 ≤ 总预算且不低于已用） |
+| POST | /api/trips/:id/expenses | 登记费用（需登录，携带 idempotencyKey 幂等键） |
+| POST | /api/trips/:id/budget/transfers | 分类间调拨（仅发起人，携带 idempotencyKey 幂等键） |
 
 ## 本地开发方式
 
@@ -49,13 +60,20 @@ npm run dev
 .
 ├── backend
 │   └── src
-│       ├── common
-│       ├── constants
+│       ├── common        # 守卫、过滤器、异常、日志
+│       ├── constants     # 错误码、状态与预算分类常量
 │       ├── config
 │       └── modules
+│           ├── budget    # 分类预算：额度、费用登记、调拨
+│           ├── trip
+│           ├── user
+│           └── ...
 ├── database
+│   └── init.sql          # 表结构（与 TypeORM 实体对齐）与演示数据
 ├── frontend
 │   └── src
+│       ├── components    # BudgetBoard、ExpenseForm、TransferForm 等
+│       └── types
 └── docker-compose.yml
 ```
 
