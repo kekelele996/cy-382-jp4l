@@ -35,7 +35,34 @@ CREATE TABLE IF NOT EXISTS budgets (
   trip_id BIGINT NOT NULL,
   category VARCHAR(40) NOT NULL,
   planned DECIMAL(10,2) NOT NULL,
-  spent DECIMAL(10,2) NOT NULL DEFAULT 0
+  spent DECIMAL(10,2) NOT NULL DEFAULT 0,
+  UNIQUE KEY uk_budget_trip_category (trip_id, category)
+);
+
+CREATE TABLE IF NOT EXISTS budget_expenses (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  request_id VARCHAR(80) NOT NULL,
+  trip_id BIGINT NOT NULL,
+  category VARCHAR(40) NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  note VARCHAR(160),
+  member_id BIGINT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_budget_expense_request (request_id),
+  KEY idx_budget_expense_trip (trip_id)
+);
+
+CREATE TABLE IF NOT EXISTS budget_transfers (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  request_id VARCHAR(80) NOT NULL,
+  trip_id BIGINT NOT NULL,
+  from_category VARCHAR(40) NOT NULL,
+  to_category VARCHAR(40) NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  operator_id BIGINT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_budget_transfer_request (request_id),
+  KEY idx_budget_transfer_trip (trip_id)
 );
 
 CREATE TABLE IF NOT EXISTS diary_entries (

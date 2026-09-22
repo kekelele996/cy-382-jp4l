@@ -17,6 +17,7 @@ docker compose up -d --build
 - 根据目的地、时间和预算做旅伴匹配评分。
 - 行程协作看板维护每日安排、住宿和交通方案。
 - 预算管理展示计划费用和实际花费。
+- 行程协作看板支持**分类预算调拨**：按交通、住宿、餐饮、门票设置分类额度（合计不超过总预算）；成员登记费用只扣对应分类，超出剩余额度整笔拒绝并返回可登记上限；发起人可在分类间调拨剩余额度（调出后不低于已用金额）。费用登记与调拨均通过 `requestId` 幂等 + 数据库行锁/唯一索引保证只生效一次，页面展示各类额度、已用与剩余，刷新后一致。
 - Socket.IO 支持行程成员即时聊天。
 - 旅行日记和用户主页为后续扩展预留清晰模块。
 
@@ -58,6 +59,19 @@ npm run dev
 │   └── src
 └── docker-compose.yml
 ```
+
+## 环境变量说明
+
+### 分类预算接口
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/api/trips/:tripId/budget` | 查询各分类额度、已用、剩余及合计 |
+| PUT | `/api/trips/:tripId/budget` | 发起人设置/调整四类额度（合计不超过总预算、不低于已用） |
+| POST | `/api/trips/:tripId/budget/expenses` | 成员登记费用，只扣对应分类；超额整笔拒绝，响应中返回 `maxAmount` 可登记上限 |
+| POST | `/api/trips/:tripId/budget/transfers` | 发起人调拨分类剩余额度，响应中返回 `maxTransferable` 可调拨上限 |
+
+费用登记与调拨请求体必须携带唯一 `requestId`：重复或并发提交只成功一次（返回 `duplicate: true`），同一 `requestId` 参数不一致返回 `BUDGET_REQUEST_CONFLICT`。
 
 ## 环境变量说明
 
